@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  composer:
+    image: composer:latest
+    volumes:
+      - ./composer.json:/app/composer.json
+    entrypoint:
+      - composer
+      - install
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./docker/nginx:/etc/nginx/conf.d
+      - ./:/var/www/vi-project
+    depends_on:
+      - php
+  php:
+    build: ./docker/images/php
+    depends_on:
+      - mysql
+      - composer
+    volumes:
+      - ./:/var/www/vi-project
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "33061:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "secretpassword"
+      MYSQL_DATABASE: "vidb"

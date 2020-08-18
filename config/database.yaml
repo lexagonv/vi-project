@@ -1,0 +1,7 @@
+database:
+  driver: 'pdo_mysql'
+  host: 'mysql'
+  port: '3306'
+  password: 'secretpassword'
+  user: 'root'
+  dbname: 'vidb'

@@ -1,0 +1,12 @@
+product_generate:
+  path: /product/generate
+  defaults: {_controller: 'App\Controller\ProductController::generate'}
+
+order_create:
+  path: /order/create
+  defaults: {_controller: 'App\Controller\OrderController::create'}
+
+order_pay:
+  path: /order/pay
+  defaults: {_controller: 'App\Controller\OrderController::pay'}
+
