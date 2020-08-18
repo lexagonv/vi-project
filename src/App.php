@@ -4,7 +4,6 @@ namespace App;
 
 use Exception;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;

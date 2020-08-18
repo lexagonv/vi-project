@@ -20,6 +20,13 @@ class OrderController extends Controller
     public function create()
     {
         $request = app()->getRequest();
+        $login = $request->headers->get('login');
+        if (!$login or $login != 'admin') {
+            return $this->response([
+                'success' => false,
+                'message' => 'Доступ закрыт',
+            ]);
+        }
         if ($request->getMethod() != 'POST') {
             return $this->response([
                 'success' => false,
@@ -28,15 +35,15 @@ class OrderController extends Controller
         }
         $em = $this->getEntityManager();
         $repository = $em->getRepository('App\Entity\Orders');
-        $productsId = $request->request->all();
-        if (empty($productsId)) {
+        $products = json_decode($request->request->get('products'), true);
+        if (empty($products)) {
             return $this->response([
                 'success' => false,
-                'message' => 'Не указаны товары для добавления в заказ.'
+                'message' => 'Не указаны товары для заказа'
             ]);
         }
         /** @var Orders $order */
-        $order = $repository->create($productsId);
+        $order = $repository->create($products);
 
         return $this->response([
             'success' => true,
@@ -53,8 +60,16 @@ class OrderController extends Controller
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function pay() {
+    public function pay()
+    {
         $request = app()->getRequest();
+        $login = $request->headers->get('login');
+        if (!$login or $login != 'admin') {
+            return $this->response([
+                'success' => false,
+                'message' => 'Доступ закрыт',
+            ]);
+        }
         if ($request->getMethod() != 'POST') {
             return $this->response([
                 'success' => false,
@@ -62,8 +77,9 @@ class OrderController extends Controller
             ]);
         }
         $em = $this->getEntityManager();
-        $orderId = $request->request->get('orderId');
-        if (!$orderId) {
+        $orderData = json_decode($request->request->get('order'), true);
+        $id = isset($orderData['id']) ? $orderData['id'] : null;
+        if (!$id) {
             return $this->response([
                 'success' => false,
                 'message' => 'Не указан заказ для оплаты',
@@ -71,7 +87,7 @@ class OrderController extends Controller
         }
 
         /** @var Orders $order */
-        $order = $em->getRepository('App\Entity\Orders')->findOneBy(['id' => $orderId]);
+        $order = $em->getRepository('App\Entity\Orders')->findOneBy(['id' => $id]);
         if (!$order) {
             return $this->response([
                 'success' => false,
@@ -79,7 +95,7 @@ class OrderController extends Controller
             ]);
         }
 
-        $sum = $request->request->get('orderSum');
+        $sum = isset($orderData['sum']) ? $orderData['sum'] : null;
         if ($order->getSum() != $sum) {
             return $this->response([
                 'success' => false,
@@ -88,7 +104,7 @@ class OrderController extends Controller
         }
 
         $ch = curl_init('https://ya.ru');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_exec($ch);
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
