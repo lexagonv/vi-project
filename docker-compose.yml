@@ -1,9 +1,10 @@
 version: '3.8'
 services:
-  composer:
+  composer2:
     image: composer:latest
     volumes:
-      - ./composer.json:/app/composer.json
+      - ./:/var/www/vi-project
+    working_dir: /var/www/vi-project
     entrypoint:
       - composer
       - install
@@ -18,9 +19,6 @@ services:
       - php
   php:
     build: ./docker/images/php
-    depends_on:
-      - mysql
-      - composer
     volumes:
       - ./:/var/www/vi-project
   mysql:
