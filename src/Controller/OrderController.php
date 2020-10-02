@@ -95,6 +95,13 @@ class OrderController extends Controller
             ]);
         }
 
+        if ($order->isPaid()) {
+            return $this->response([
+                'success' => false,
+                'message' => 'Заказ уже оплачен',
+            ]);
+        }
+
         $sum = isset($orderData['sum']) ? $orderData['sum'] : null;
         if ($order->getSum() != $sum) {
             return $this->response([
